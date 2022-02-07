@@ -1,0 +1,36 @@
+version: 2.1
+
+orbs:
+  aws-eks: circleci/aws-eks@0.2.3
+  kubernetes: circleci/kubernetes@0.4.0
+
+jobs:
+  test-cluster:
+    executor: aws-eks/python3
+    parameters:
+      cluster-name:
+        description: |
+          Name of the EKS cluster
+        type: string
+    steps:
+      - kubernetes/install
+      - aws-eks/update-kubeconfig-with-authenticator:
+          cluster-name: << parameters.cluster-name >>
+      - run:
+          command: |
+            kubectl get services && sleep 300
+          name: Test cluster
+
+workflows:
+  deployment:
+    jobs:
+      - aws-eks/create-cluster:
+          cluster-name: udacity-capstone
+      - test-cluster:
+          cluster-name: udacity-capstone
+          requires:
+            - aws-eks/create-cluster
+      # - aws-eks/delete-cluster:
+      #     cluster-name: udacity-capstone
+      #     requires:
+      #       - test-cluster
