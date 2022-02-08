@@ -131,7 +131,7 @@ workflows:
             # - test-cluster
       - aws-eks/update-container-image:
           cluster-name: udacity-capstone
-          container-image-updates: 'udacity-capstone=izzyandrade/udacity-capstone:2.0
+          container-image-updates: udacity-capstone=izzyandrade/udacity-capstone:2.0
           post-steps:
             - kubernetes/delete-resource:
                 resource-names: udacity-capstone
