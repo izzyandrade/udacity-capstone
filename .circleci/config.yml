@@ -79,7 +79,7 @@ jobs:
           cluster-name: << parameters.cluster-name >>
       - run:
           command: |
-            kubectl get services && sleep 300
+            kubectl get services && sleep 50
           name: Test cluster
 
   create-docker-build:
@@ -90,7 +90,7 @@ jobs:
           name: Build docker container and send to dockerhub
           no_output_timeout: 30m
           command: |
-            ./upload_docker.sh ${DOCKER_USER} ${DOCKER_PASS} ${CIRCLE_WORKFLOW_ID}
+            ./upload_docker.sh ${DOCKER_USER} ${DOCKER_PASS}
 
   create-deployment:
     executor: aws-eks/python3
@@ -131,7 +131,7 @@ workflows:
             # - test-cluster
       - aws-eks/update-container-image:
           cluster-name: udacity-capstone
-          container-image-updates: 'udacity-capstone=izzyandrade/udacity-capstone:${CIRCLE_WORKFLOW_ID}'
+          container-image-updates: 'udacity-capstone=izzyandrade/udacity-capstone:2.0
           post-steps:
             - kubernetes/delete-resource:
                 resource-names: udacity-capstone

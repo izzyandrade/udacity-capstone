@@ -1,22 +1,28 @@
-apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: udacity-capstone
   labels:
     app: udacity-capstone
+  namespace: default
 spec:
+  replicas: 3
   selector:
     matchLabels:
       app: udacity-capstone
-  replicas: 2 # tells deployment to run 2 pods matching the template
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate
   template:
     metadata:
       labels:
         app: udacity-capstone
     spec:
       containers:
-        - name: udacity-capstone
-          image: izzyandrade/udacity-capstone
+        - image: izzyandrade/udacity-capstone:2.0
+          imagePullPolicy: Always
+          name: udacity-capstone
           ports:
             - containerPort: 80
 
