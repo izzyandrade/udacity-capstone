@@ -108,6 +108,7 @@ jobs:
           get-rollout-status: true
           resource-file-path: deployment.yml
           resource-name: deployment/udacity-capstone
+          no_output_timeout: 30m
 
 workflows:
   deployment:
