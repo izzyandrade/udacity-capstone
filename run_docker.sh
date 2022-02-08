@@ -8,4 +8,4 @@ docker images
 
 # Step 3: 
 # Run flask app
-# docker run -p 8000:80 udacity-capstone
+docker run -p 8000:80 udacity-capstone
