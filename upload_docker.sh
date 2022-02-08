@@ -9,10 +9,10 @@ dockerpath=izzyandrade/udacity-capstone
 
 # Step 2:  
 # Authenticate & tag
-docker login --username izzyandrade
-docker tag udacity-capstone $dockerpath 
+docker login -u $1 -p $2
+docker tag udacity-capstone $dockerpath:$3 
 echo "Docker ID and Image: $dockerpath"
 
 # Step 3:
 # Push image to a docker repository
-docker push $dockerpath
+docker push $dockerpath:$3 

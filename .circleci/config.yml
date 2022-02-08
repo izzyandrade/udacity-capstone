@@ -5,6 +5,44 @@ orbs:
   kubernetes: circleci/kubernetes@0.4.0
 
 jobs:
+  build:
+    docker:
+      - image: python:3.7.3-stretch
+    steps:
+      - checkout
+      - restore-cache:
+          keys:
+            - v1-dependencies-{{ checksum "requirements.txt" }}
+            - v1-dependencies-
+      - run:
+          name: Install project dependencies
+          command: |
+            python3 -m venv udacity
+            . udacity/bin/activate
+            make install
+            wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
+            chmod +x /bin/hadolint
+      - run:
+          name: run lint
+          command: |
+            . venv/bin/activate
+            make lint
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-dependencies{{ checksum "requirements.txt" }}
+
+  create-docker-build:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: Build docker container and send to dockerhub
+          no_output_timeout: 30m
+          command: |
+            ./run_docker.sh
+            ./upload_docker.sh ${DOCKER_USER} ${DOCKER_PASS} ${CIRCLE_WORKFLOW_ID}
+
   create-cluster:
     executor: aws-eks/python3
     parameters:
@@ -12,7 +50,6 @@ jobs:
         description: |
           Name of the EKS cluster
         type: string
-
     steps:
       - run:
           name: Install the eksctl tool
@@ -33,6 +70,12 @@ jobs:
             rmdir eksctl_download
       - aws-eks/create-cluster:
           cluster-name: << parameters.cluster-name >>
+          skip-kubectl-install: false
+          verbose: 3
+          node-type: t2.micro
+          nodes-max: 2
+          ssh-access: false
+          ssh-public-key: ''
 
   test-cluster:
     executor: aws-eks/python3
@@ -50,16 +93,52 @@ jobs:
             kubectl get services && sleep 300
           name: Test cluster
 
+  create-deployment:
+    executor: aws-eks/python3
+    parameters:
+      cluster-name:
+        description: |
+          Name of the EKS cluster
+        type: string
+    steps:
+      - checkout
+      - aws-eks/update-kubeconfig-with-authenticator:
+          cluster-name: << parameters.cluster-name >>
+          install-kubectl: true
+      - kubernetes/create-or-update-resource:
+          get-rollout-status: true
+          resource-file-path: deployment.yml
+          resource-name: deployment/udacity-capstone-deployment
+
 workflows:
   deployment:
     jobs:
+      - build
       - create-cluster:
           cluster-name: udacity-capstone
+          requires:
+            - build
       - test-cluster:
           cluster-name: udacity-capstone
           requires:
             - create-cluster
-      # - aws-eks/delete-cluster:
-      #     cluster-name: udacity-capstone
-      #     requires:
-      #       - test-cluster
+      - create-docker-build:
+          requires:
+            - test-cluster
+      - create-deployment:
+          cluster-name: udacity-capstone
+          requires:
+            - test-cluster
+      - aws-eks/update-container-image:
+          cluster-name: udacity-capstone
+          container-image-updates: 'udacity-capstone=izzyandrade/udacity-capstone:${CIRCLE_WORKFLOW_ID}'
+          post-steps:
+            - kubernetes/delete-resource:
+                resource-names: udacity-capstone-deployment
+                resource-types: deployment
+                wait: true
+          record: true
+          requires:
+            - create-deployment
+            - create-docker-build
+          resource-name: deployment/udacity-capstone-deployment
