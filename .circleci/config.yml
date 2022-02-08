@@ -25,11 +25,11 @@ jobs:
       - run:
           name: run lint
           command: |
-            . venv/bin/activate
+            . udacity/bin/activate
             make lint
       - save_cache:
           paths:
-            - ./venv
+            - ./udacity
           key: v1-dependencies{{ checksum "requirements.txt" }}
 
   create-docker-build:
