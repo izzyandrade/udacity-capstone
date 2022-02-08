@@ -10,6 +10,7 @@ dockerpath=izzyandrade/udacity-capstone
 # Step 2:  
 # Authenticate & tag
 docker login -u $1 -p $2
+docker build -t udacity-capstone .
 docker tag udacity-capstone $dockerpath:$3 
 echo "Docker ID and Image: $dockerpath"
 
