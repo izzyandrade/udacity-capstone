@@ -32,17 +32,6 @@ jobs:
             - ./udacity
           key: v1-dependencies{{ checksum "requirements.txt" }}
 
-  create-docker-build:
-    machine: true
-    steps:
-      - checkout
-      - run:
-          name: Build docker container and send to dockerhub
-          no_output_timeout: 30m
-          command: |
-            ./run_docker.sh
-            ./upload_docker.sh ${DOCKER_USER} ${DOCKER_PASS} ${CIRCLE_WORKFLOW_ID}
-
   create-cluster:
     executor: aws-eks/python3
     parameters:
@@ -93,6 +82,17 @@ jobs:
             kubectl get services && sleep 300
           name: Test cluster
 
+  create-docker-build:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: Build docker container and send to dockerhub
+          no_output_timeout: 30m
+          command: |
+            ./run_docker.sh
+            ./upload_docker.sh ${DOCKER_USER} ${DOCKER_PASS} ${CIRCLE_WORKFLOW_ID}
+
   create-deployment:
     executor: aws-eks/python3
     parameters:
@@ -108,7 +108,7 @@ jobs:
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
           resource-file-path: deployment.yml
-          resource-name: deployment/udacity-capstone-deployment
+          resource-name: deployment/udacity-capstone
 
 workflows:
   deployment:
@@ -128,17 +128,18 @@ workflows:
       - create-deployment:
           cluster-name: udacity-capstone
           requires:
+            - create-docker-build
             - test-cluster
       - aws-eks/update-container-image:
           cluster-name: udacity-capstone
           container-image-updates: 'udacity-capstone=izzyandrade/udacity-capstone:${CIRCLE_WORKFLOW_ID}'
           post-steps:
             - kubernetes/delete-resource:
-                resource-names: udacity-capstone-deployment
+                resource-names: udacity-capstone
                 resource-types: deployment
                 wait: true
           record: true
           requires:
             - create-deployment
             - create-docker-build
-          resource-name: deployment/udacity-capstone-deployment
+          resource-name: deployment/udacity-capstone
