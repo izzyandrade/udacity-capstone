@@ -112,23 +112,23 @@ jobs:
 workflows:
   deployment:
     jobs:
-      - build
-      - create-cluster:
-          cluster-name: udacity-capstone
-          requires:
-            - build
-      - test-cluster:
-          cluster-name: udacity-capstone
-          requires:
-            - create-cluster
-      - create-docker-build:
-          requires:
-            - test-cluster
-      - create-deployment:
-          cluster-name: udacity-capstone
-          requires:
-            - create-docker-build
-            - test-cluster
+      # - build
+      # - create-cluster:
+      #     cluster-name: udacity-capstone
+      #     requires:
+      #       - build
+      # - test-cluster:
+      #     cluster-name: udacity-capstone
+      #     requires:
+      #       - create-cluster
+      # - create-docker-build:
+      #     requires:
+      #       - test-cluster
+      # - create-deployment:
+      #     cluster-name: udacity-capstone
+      #     requires:
+      #       - create-docker-build
+      #       - test-cluster
       - aws-eks/update-container-image:
           cluster-name: udacity-capstone
           container-image-updates: udacity-capstone=izzyandrade/udacity-capstone:latest
@@ -138,7 +138,7 @@ workflows:
                 resource-types: deployment
                 wait: true
           record: true
-          requires:
-            - create-deployment
-            - create-docker-build
-          resource-name: deployment/udacity-capstone
+          # requires:
+          #   - create-deployment
+          #   - create-docker-build
+          resource-name: deployment/udacity-capstone-deployment
