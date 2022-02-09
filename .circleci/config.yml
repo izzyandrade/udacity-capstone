@@ -61,7 +61,7 @@ jobs:
           cluster-name: << parameters.cluster-name >>
           skip-kubectl-install: false
           verbose: 3
-          node-type: t2.micro
+          node-type: t2.small
           nodes-max: 2
           ssh-access: false
           ssh-public-key: ''
@@ -107,32 +107,31 @@ jobs:
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
           resource-file-path: deployment.yml
-          resource-name: deployment/udacity-capstone
-          no_output_timeout: 30m
+          resource-name: deployment/udacity-capstone-deployment
 
 workflows:
   deployment:
     jobs:
       - build
-      # - create-cluster:
-      #     cluster-name: udacity-capstone
-      #     requires:
-      #       - build
-      # - test-cluster:
-      #     cluster-name: udacity-capstone
-      #     requires:
-      #       - create-cluster
+      - create-cluster:
+          cluster-name: udacity-capstone
+          requires:
+            - build
+      - test-cluster:
+          cluster-name: udacity-capstone
+          requires:
+            - create-cluster
       - create-docker-build
-        # requires:
-        #   - test-cluster
+          requires:
+            - test-cluster
       - create-deployment:
           cluster-name: udacity-capstone
           requires:
             - create-docker-build
-            # - test-cluster
+            - test-cluster
       - aws-eks/update-container-image:
           cluster-name: udacity-capstone
-          container-image-updates: udacity-capstone=izzyandrade/udacity-capstone:2.0
+          container-image-updates: udacity-capstone=izzyandrade/udacity-capstone:latest
           post-steps:
             - kubernetes/delete-resource:
                 resource-names: udacity-capstone

@@ -1,9 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: udacity-capstone
+  name: udacity-capstone-deployment
   labels:
     app: udacity-capstone
+    type: restapi
   namespace: default
 spec:
   replicas: 3
@@ -17,20 +18,21 @@ spec:
   template:
     metadata:
       labels:
+        name: udacity-capstone-tmpl
         app: udacity-capstone
     spec:
       containers:
-        - image: izzyandrade/udacity-capstone:2.0
+        - image: izzyandrade/udacity-capstone:latest
           imagePullPolicy: Always
           name: udacity-capstone
           ports:
-            - containerPort: 80
+            - containerPort: 5000
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: udacity-capstone
+  name: udacity-capstone-svc
   labels:
     app: udacity-capstone
 spec:
@@ -39,5 +41,5 @@ spec:
     app: udacity-capstone
   ports:
     - port: 8000
-      targetPort: 80
+      targetPort: 5000
       protocol: TCP

@@ -11,9 +11,9 @@ COPY . app.py /project/
 RUN pip install --no-cache-dir --upgrade pip &&\
     pip install --no-cache-dir --trusted-host pypi.python.org -r requirements.txt
 
-EXPOSE 80
+EXPOSE 5000
 
 ## Step 5:
 # Run app.py at container launch
-CMD ["python", "app.py", "runserver", "0.0.0.0:80"]
+CMD ["python", "app.py"]
 
