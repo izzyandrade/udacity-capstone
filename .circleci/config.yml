@@ -134,7 +134,7 @@ workflows:
           container-image-updates: udacity-capstone=izzyandrade/udacity-capstone:latest
           post-steps:
             - kubernetes/delete-resource:
-                resource-names: udacity-capstone
+                resource-names: udacity-capstone-deployment
                 resource-types: deployment
                 wait: true
           record: true
