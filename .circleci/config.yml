@@ -113,25 +113,23 @@ workflows:
   deployment:
     jobs:
       - build
-      - create-cluster:
-          cluster-name: udacity-capstone
-          requires:
-            - build
-      - test-cluster:
-          cluster-name: udacity-capstone
-          requires:
-            - create-cluster
-      - create-docker-build:
-          requires:
-            - test-cluster
+      # - create-cluster:
+      #     cluster-name: udacity-capstone
+      #     requires:
+      #       - build
+      # - test-cluster:
+      #     cluster-name: udacity-capstone
+      #     requires:
+      #       - create-cluster
+      - create-docker-build
       - create-deployment:
           cluster-name: udacity-capstone
           requires:
             - create-docker-build
-            - test-cluster
+            # - test-cluster
       - aws-eks/update-container-image:
           cluster-name: udacity-capstone
-          container-image-updates: udacity-capstone=izzyandrade/udacity-capstone:latest
+          container-image-updates: udacity-capstone-app=izzyandrade/udacity-capstone:latest
           post-steps:
             - kubernetes/delete-resource:
                 resource-names: udacity-capstone-app
