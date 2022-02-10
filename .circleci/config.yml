@@ -90,7 +90,7 @@ jobs:
           name: Build docker container and send to dockerhub
           no_output_timeout: 30m
           command: |
-            ./upload_docker.sh ${DOCKER_USER} ${DOCKER_PASS}
+            ./upload_docker.sh ${DOCKER_USER} ${DOCKER_PASS} ${CIRCLE_WORKFLOW_ID}
 
   create-deployment:
     executor: aws-eks/python3
@@ -129,7 +129,7 @@ workflows:
             # - test-cluster
       - aws-eks/update-container-image:
           cluster-name: udacity-capstone
-          container-image-updates: udacity-capstone-app=izzyandrade/udacity-capstone:latest
+          container-image-updates: udacity-capstone-app=izzyandrade/udacity-capstone:${CIRCLE_WORKFLOW_ID}
           record: true
           requires:
             - create-deployment
