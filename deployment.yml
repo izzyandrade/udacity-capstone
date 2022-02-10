@@ -1,32 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: udacity-capstone-deployment
+  name: udacity-capstone-app
   labels:
-    app: udacity-capstone-deployment
+    app: udacity-capstone-app
     type: restapi
   namespace: default
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
-      app: udacity-capstone
-  strategy:
-    rollingUpdate:
-      maxUnavailable: 1
-    type: RollingUpdate
+      app: udacity-capstone-app
+  # strategy:
+  #   rollingUpdate:
+  #     maxUnavailable: 1
+  #   type: RollingUpdate
   template:
     metadata:
       labels:
         name: udacity-capstone-tmpl
-        app: udacity-capstone
+        app: udacity-capstone-app
     spec:
       containers:
         - image: izzyandrade/udacity-capstone:latest
           imagePullPolicy: Always
-          name: udacity-capstone
+          name: udacity-capstone-app
           ports:
-            - containerPort: 5000
+            - containerPort: 80
 
 ---
 apiVersion: v1
@@ -34,12 +34,12 @@ kind: Service
 metadata:
   name: udacity-capstone-svc
   labels:
-    app: udacity-capstone-svc
+    app: udacity-capstone-app
 spec:
   type: LoadBalancer
   selector:
-    app: udacity-capstone-deployment
+    app: udacity-capstone-app
   ports:
-    - port: 8000
-      targetPort: 5000
+    - port: 80
+      targetPort: 80
       protocol: TCP

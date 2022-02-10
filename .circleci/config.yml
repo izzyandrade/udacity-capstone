@@ -107,7 +107,7 @@ jobs:
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
           resource-file-path: deployment.yml
-          resource-name: deployment/udacity-capstone-deployment
+          resource-name: deployment/udacity-capstone-app
 
 workflows:
   deployment:
@@ -134,11 +134,11 @@ workflows:
           container-image-updates: udacity-capstone=izzyandrade/udacity-capstone:latest
           post-steps:
             - kubernetes/delete-resource:
-                resource-names: udacity-capstone-deployment
+                resource-names: udacity-capstone-app
                 resource-types: deployment
                 wait: true
           record: true
           requires:
             - create-deployment
             - create-docker-build
-          resource-name: deployment/udacity-capstone-deployment
+          resource-name: deployment/udacity-capstone-app
