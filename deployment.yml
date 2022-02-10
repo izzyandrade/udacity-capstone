@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: udacity-capstone-deployment
   labels:
-    app: udacity-capstone
+    app: udacity-capstone-deployment
     type: restapi
   namespace: default
 spec:
@@ -34,11 +34,11 @@ kind: Service
 metadata:
   name: udacity-capstone-svc
   labels:
-    app: udacity-capstone
+    app: udacity-capstone-svc
 spec:
   type: LoadBalancer
   selector:
-    app: udacity-capstone
+    app: udacity-capstone-deployment
   ports:
     - port: 8000
       targetPort: 5000
