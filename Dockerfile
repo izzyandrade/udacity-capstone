@@ -1,5 +1,5 @@
 FROM python:3.7.3-stretch
-LAAAAAAAAAAAAAAAAAAAAAAAAA
+
 # Create a working directory
 WORKDIR /project
 
