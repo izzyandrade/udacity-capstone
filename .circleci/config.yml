@@ -121,7 +121,9 @@ workflows:
       #     cluster-name: udacity-capstone
       #     requires:
       #       - create-cluster
-      - create-docker-build
+      - create-docker-build:
+          requires:
+            - build
       - create-deployment:
           cluster-name: udacity-capstone
           requires:
