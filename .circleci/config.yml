@@ -130,11 +130,6 @@ workflows:
       - aws-eks/update-container-image:
           cluster-name: udacity-capstone
           container-image-updates: udacity-capstone-app=izzyandrade/udacity-capstone:latest
-          post-steps:
-            - kubernetes/delete-resource:
-                resource-names: udacity-capstone-app
-                resource-types: deployment
-                wait: true
           record: true
           requires:
             - create-deployment
